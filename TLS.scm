@@ -15,7 +15,7 @@
   (lambda (a lat)
     (cond
       ((null? lat) #f)
-      (else (or (eq? (car lat) a)
+      (else (or (equal? (car lat) a)
                 (member? a (cdr lat)))))))
 
 (define firsts
@@ -29,7 +29,7 @@
     (cond
       ((null? lat) '())
       (else (cond
-              ((eq? (car lat) old) (cons old (cons new (cdr lat))))
+              ((equal? (car lat) old) (cons old (cons new (cdr lat))))
               (else (cons (car lat) (insertR new old (cdr lat)))))))))
 
 (define insertL
@@ -37,7 +37,7 @@
     (cond
       ((null? lat) '())
       (else (cond
-              ((eq? (car lat) old) (cons new lat))
+              ((equal? (car lat) old) (cons new lat))
               (else (cons (car lat) (insertL new old (cdr lat)))))))))
 
 (define subst
@@ -45,7 +45,7 @@
     (cond
       ((null? lat) '())
       (else (cond
-              ((eq? (car lat) old) (cons new (cdr lat)))
+              ((equal? (car lat) old) (cons new (cdr lat)))
               (else (cons (car lat) (subst new old (cdr lat)))))))))
 
 (define subst2
@@ -53,7 +53,7 @@
     (cond
       ((null? lat) '())
       (else (cond
-              ((or (eq? (car lat) o1) (eq? (car lat) o2)) (cons new (cdr lat)))
+              ((or (equal? (car lat) o1) (equal? (car lat) o2)) (cons new (cdr lat)))
               (else (cons (car lat) (subst2 new o1 o2 (cdr lat)))))))))
 
 (define multirember
@@ -61,7 +61,7 @@
     (cond
       ((null? lat) '())
       (else (cond
-              ((eq? (car lat) a) (multirember a (cdr lat)))
+              ((equal? (car lat) a) (multirember a (cdr lat)))
               (else (cons (car lat) (multirember a (cdr lat)))))))))
 
 (define multiinsertR
@@ -69,7 +69,7 @@
     (cond
       ((null? lat) '())
       (else (cond
-              ((eq? (car lat) old) (cons (car lat) (cons new (multiinsertR new old (cdr lat)))))
+              ((equal? (car lat) old) (cons (car lat) (cons new (multiinsertR new old (cdr lat)))))
               (else (cons (car lat) (multiinsertR new old (cdr lat)))))))))
 
 (define multiinsertL
@@ -77,7 +77,7 @@
     (cond
       ((null? lat) '())
       (else (cond
-              ((eq? (car lat) old) (cons new (cons (car lat) (multiinsertL new old (cdr lat)))))
+              ((equal? (car lat) old) (cons new (cons (car lat) (multiinsertL new old (cdr lat)))))
               (else (cons (car lat) (multiinsertL new old (cdr lat)))))))))
 
 (define multisubst
@@ -85,7 +85,7 @@
     (cond
       ((null? lat) '())
       (else (cond
-              ((eq? (car lat) old) (cons new (multisubst new old (cdr lat))))
+              ((equal? (car lat) old) (cons new (multisubst new old (cdr lat))))
               (else (cons (car lat) (multisubst new old (cdr lat)))))))))
 
 (define add1
@@ -179,6 +179,7 @@
       (else (cond
               ((number? (car lat)) (no-nums (cdr lat)))
               (else (cons (car lat) (no-nums (cdr lat)))))))))
+
 (define all-nums
   (lambda (lat)
     (cond
@@ -199,7 +200,7 @@
     (cond
       ((null? lat) 0)
       (else (cond
-              ((eq? (car lat) a) (add1 (occur a (cdr lat))))
+              ((equal? (car lat) a) (add1 (occur a (cdr lat))))
               (else (occur a (cdr lat))))))))
 
 (define one?
@@ -218,7 +219,7 @@
       ((null? l) '())
       ((atom? (car l))
        (cond
-         ((eq? (car l) a) (rember* a (cdr l)))
+         ((equal? (car l) a) (rember* a (cdr l)))
          (else (cons (car l) (rember* a (cdr l))))))
       (else (cons (rember* a (car l)) (rember* a (cdr l)))))))
 
@@ -228,7 +229,7 @@
       ((null? l) '())
       ((atom? (car l))
        (cond
-         ((eq? (car l) old) (cons (car l) (cons new (insertR* new old (cdr l)))))
+         ((equal? (car l) old) (cons (car l) (cons new (insertR* new old (cdr l)))))
          (else (cons (car l) (insertR* new old (cdr l))))))
        (else (cons (insertR* new old (car l)) (insertR* new old (cdr l)))))))
 
@@ -238,7 +239,7 @@
       ((null? l) 0)
       ((atom? (car l))
        (cond
-         ((eq? (car l) a) (add1 (occur* a (cdr l))))
+         ((equal? (car l) a) (add1 (occur* a (cdr l))))
          (else (occur* a (cdr l)))))
       (else (o+ (occur* a (car l)) (occur* a (cdr l)))))))
 
@@ -248,7 +249,7 @@
       ((null? l) '())
       ((atom? (car l))
        (cond
-         ((eq? (car l) old) (cons new (subst* new old (cdr l))))
+         ((equal? (car l) old) (cons new (subst* new old (cdr l))))
          (else (cons (car l) (subst* new old (cdr l))))))
       (else (cons (subst* new old (car l)) (subst* new old (cdr l)))))))
 
@@ -258,7 +259,7 @@
       ((null? l) '())
       ((atom? (car l))
        (cond
-         ((eq? (car l) old) (cons new (cons (car l) (insertL* new old (cdr l)))))
+         ((equal? (car l) old) (cons new (cons (car l) (insertL* new old (cdr l)))))
          (else (cons (car l) (insertL* new old (cdr l))))))
       (else (cons (insertL* new old (car l)) (insertL* new old (cdr l)))))))
 
@@ -266,7 +267,7 @@
   (lambda (a l)
     (cond
       ((null? l) #f)
-      ((atom? (car l)) (or (eq? (car l) a) (member* a (cdr l))))
+      ((atom? (car l)) (or (equal? (car l) a) (member* a (cdr l))))
       (else (or (member* a (car l)) (member* a (cdr l)))))))
 
 (define leftmost
@@ -306,8 +307,8 @@
   (lambda (nexp)
     (cond
       ((atom? nexp) nexp)
-      ((eq? (operator nexp) '+) (o+ (value (1st-sub-exp nexp)) (value (2nd-sub-exp nexp))))
-      ((eq? (operator nexp) 'x) (* (value (1st-sub-exp nexp)) (value (2nd-sub-exp nexp))))
+      ((equal? (operator nexp) '+) (o+ (value (1st-sub-exp nexp)) (value (2nd-sub-exp nexp))))
+      ((equal? (operator nexp) 'x) (* (value (1st-sub-exp nexp)) (value (2nd-sub-exp nexp))))
       (else (expt (value (1st-sub-exp nexp)) (value (2nd-sub-exp nexp)))))))
 
 (define 1st-sub-exp
@@ -339,3 +340,101 @@
     (cond
       ((sero? m) n)
       (else (edd1 (pluz n (zub1 m)))))))
+
+(define set?
+  (lambda (lat)
+    (cond
+      ((null? lat) #t)
+      ((member? (car lat) (cdr lat)) #f)
+      (else (set? (cdr lat))))))
+
+(define makeset
+  (lambda (lat)
+    (cond
+      ((null? lat) '())
+      (else (cons (car lat) (makeset (multirember (car lat) (cdr lat))))))))
+
+(define subset?
+  (lambda (set1 set2)
+    (cond
+      ((null? set1) #t)
+      (else (and (member? (car set1) set2) (subset? (cdr set1) set2))))))
+
+(define eqset?
+  (lambda (set1 set2)
+    (and (subset? set1 set2) (subset? set2 set1))))
+
+(define intersect?
+  (lambda (set1 set2)
+    (cond
+      ((null? set1) #f)
+      (else (or (member? (car set1) set2) (intersect? (cdr set1) set2))))))
+
+(define intersect
+  (lambda (set1 set2)
+    (cond
+      ((null? set1) '())
+      ((member? (car set1) set2) (cons (car set1) (intersect (cdr set1) set2)))
+      (else (intersect (cdr set1) set2)))))
+
+(define union
+  (lambda (set1 set2)
+    (cond
+      ((null? set1) set2)
+      ((member? (car set1) set2) (union (cdr set1) set2))
+      (else (cons (car set1) (union (cdr set1) set2))))))
+
+(define intersectall
+  (lambda (l-set)
+    (cond
+      ((null? (cdr l-set)) (car l-set))
+      (else (intersect (car l-set) (intersectall (cdr l-set)))))))
+
+(define a-pair?
+  (lambda (x)
+    (cond
+      ((atom? x) #f)
+      ((null? x) #f)
+      ((null? (cdr x)) #f)
+      ((null? (cdr (cdr x))) #t)
+      (else #f))))
+
+(define first
+  (lambda (p)
+    (car p)))
+
+(define second
+  (lambda (p)
+    (car (cdr p))))
+
+(define build
+  (lambda (s1 s2)
+    (cons s1 (cons s2 '()))))
+
+(define third
+  (lambda (l)
+    (car (cdr (cdr l)))))
+
+(define fun?
+  (lambda (rel)
+      (set? (firsts rel))))
+
+(define revpair
+  (lambda (pair)
+    (build (second pair) (first pair))))
+
+(define revrel
+  (lambda (rel)
+    (cond
+      ((null? rel) '())
+      (else (cons (revpair (car rel)) (revrel (cdr rel)))))))
+
+(define seconds
+  (lambda (l)
+    (cond
+      ((null? l) '())
+      (else (cons (car (cdr (car l))) (seconds (cdr l)))))))
+
+(define one-to-one?
+  (lambda (fun)
+      (fun? (revrel fun))))
