@@ -24,22 +24,6 @@
       ((null? l) '())
       (else (cons (car (car l)) (firsts (cdr l)))))))
 
-(define insertR
-  (lambda (new old lat)
-    (cond
-      ((null? lat) '())
-      (else (cond
-              ((equal? (car lat) old) (cons old (cons new (cdr lat))))
-              (else (cons (car lat) (insertR new old (cdr lat)))))))))
-
-(define insertL
-  (lambda (new old lat)
-    (cond
-      ((null? lat) '())
-      (else (cond
-              ((equal? (car lat) old) (cons new lat))
-              (else (cons (car lat) (insertL new old (cdr lat)))))))))
-
 (define subst
   (lambda (new old lat)
     (cond
@@ -438,3 +422,52 @@
 (define one-to-one?
   (lambda (fun)
       (fun? (revrel fun))))
+
+(define eq?-c
+  (lambda (a)
+    (lambda (x)
+      (eq? x a))))
+
+(define rember-f
+  (lambda (test?)
+    (lambda (a l)
+      (cond
+        ((null? l) '())
+        ((test? (car l) a) (cdr l))
+        (else (cons (car l) ((rember-f test?) a (cdr l))))))))
+
+(define insertL-f
+  (lambda (test?)
+    (lambda (new old l)
+      (cond
+        ((null? l) '())
+        ((test? (car l) old) (cons new l))
+        (else (cons (car l) ((insertL-f test?) new old (cdr l))))))))
+
+(define insertR-f
+  (lambda (test?)
+    (lambda (new old l)
+      (cond
+        ((null? l) '())
+        ((test? (car l) old) (cons old (cons new (cdr l))))
+        (else (cons (car l) ((insertR-f test?) new old (cdr l))))))))
+
+(define seqR
+  (lambda (new old l)
+    (cons old (cons new l))))
+
+(define insert-g
+  (lambda (seq)
+    (lambda (new old l)
+      (cond
+        ((null? l) '())
+        ((eq? (car l) old) (seq new old (cdr l)))
+        (else (cons (car l) ((insert-g seq) new old (cdr l))))))))
+
+(define insertL
+  (insert-g
+   (lambda (new old l)
+     (cons new (cons old l)))))
+
+(define insertR
+  (insert-g seqR))
