@@ -561,3 +561,33 @@
 (define the-last-friend
   (lambda (newl product sum)
     (cons sum (cons product newl))))
+
+(define looking
+  (lambda (a lat)
+    (keep-looking a (pick 1 lat) lat)))
+
+(define keep-looking
+  (lambda (a sorn lat)
+    (cond
+      ((number? sorn) (keep-looking a (pick sorn lat) lat))
+      (else (eq? sorn a)))))
+
+(define eternity
+  (lambda (x)
+    (eternity x)))
+
+(define shift
+  (lambda (pair)
+    (build (first (first pair)) (build (second (first pair)) (second pair)))))
+
+(define length*
+  (lambda (l)
+    (cond
+      ((atom? l) 1)
+      (else (o+ (length* (first l)) (length* (second l)))))))
+
+(define weight*
+  (lambda (pora)
+    (cond
+      ((atom? pora) 1)
+      (else (o+ (* (weight* (first pora)) 2) (weight* (second pora)))))))
