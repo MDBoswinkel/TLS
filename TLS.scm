@@ -32,22 +32,6 @@
               ((or (equal? (car lat) o1) (equal? (car lat) o2)) (cons new (cdr lat)))
               (else (cons (car lat) (subst2 new o1 o2 (cdr lat)))))))))
 
-(define multiinsertR
-  (lambda (new old lat)
-    (cond
-      ((null? lat) '())
-      (else (cond
-              ((equal? (car lat) old) (cons (car lat) (cons new (multiinsertR new old (cdr lat)))))
-              (else (cons (car lat) (multiinsertR new old (cdr lat)))))))))
-
-(define multiinsertL
-  (lambda (new old lat)
-    (cond
-      ((null? lat) '())
-      (else (cond
-              ((equal? (car lat) old) (cons new (cons (car lat) (multiinsertL new old (cdr lat)))))
-              (else (cons (car lat) (multiinsertL new old (cdr lat)))))))))
-
 (define multisubst
   (lambda (new old lat)
     (cond
@@ -512,3 +496,68 @@
 (define latest-friend
   (lambda (newlat seen)
     (a-friend (cons 'and newlat) seen)))
+
+(define multiinsertR
+  (lambda (new old lat)
+    (cond
+      ((null? lat) '())
+      (else (cond
+              ((equal? (car lat) old) (cons (car lat) (cons new (multiinsertR new old (cdr lat)))))
+              (else (cons (car lat) (multiinsertR new old (cdr lat)))))))))
+
+(define multiinsertL
+  (lambda (new old lat)
+    (cond
+      ((null? lat) '())
+      (else (cond
+              ((equal? (car lat) old) (cons new (cons (car lat) (multiinsertL new old (cdr lat)))))
+              (else (cons (car lat) (multiinsertL new old (cdr lat)))))))))
+
+(define multiinsertLR
+  (lambda (new oldL oldR lat)
+    (cond
+      ((null? lat) '())
+      ((eq? (car lat) oldL) (cons new (cons oldL (multiinsertLR new oldL oldR (cdr lat)))))
+      ((eq? (car lat) oldR) (cons oldR (cons new (multiinsertLR new oldL oldR (cdr lat)))))
+      (else (cons (car lat) (multiinsertLR new oldL oldR (cdr lat)))))))
+
+(define multiinsertLR&co
+  (lambda (new oldL oldR lat col)
+    (cond
+      ((null? lat) (col '() 0 0))
+      ((eq? (car lat) oldL) (multiinsertLR&co new oldL oldR (cdr lat) (lambda (newlat L R)
+                                                                        (col (cons new (cons oldL newlat)) (add1 L) R))))
+      ((eq? (car lat) oldR) (multiinsertLR&co new oldL oldR (cdr lat) (lambda (newlat L R)
+                                                                        (col (cons oldR (cons new newlat)) L (add1 R)))))
+      (else (multiinsertLR&co new oldL oldR (cdr lat) (lambda (newlat L R)
+                                                        (col (cons (car lat) newlat) L R)))))))
+
+(define even?
+  (lambda (n)
+    (= (* (quotient n 2) 2) n)))
+
+(define evens-only*
+  (lambda (l)
+    (cond
+    ((null? l) '())
+    ((atom? (car l)) (cond
+                       ((even? (car l)) (cons (car l) (evens-only* (cdr l))))
+                       (else (evens-only* (cdr l)))))
+    (else (cons (evens-only* (car l)) (evens-only* (cdr l)))))))
+
+(define evens-only*&co
+  (lambda (l col)
+    (cond
+      ((null? l) (col '() 1 0))
+      ((atom? (car l)) (cond
+                         ((even? (car l)) (evens-only*&co (cdr l) (lambda (newlat even_product odd_sum)
+                                                                    (col (cons (car l) newlat) (* (car l) even_product) odd_sum))))
+                         (else (evens-only*&co (cdr l) (lambda (newlat even_product odd_sum)
+                                                         (col newlat even_product (o+ (car l) odd_sum)))))))
+      (else (evens-only*&co (car l) (lambda (al ap as)
+                                      (evens-only*&co (cdr l) (lambda (dl dp ds)
+                                                                (col (cons al dl) (* ap dp) (o+ as ds))))))))))
+
+(define the-last-friend
+  (lambda (newl product sum)
+    (cons sum (cons product newl))))
